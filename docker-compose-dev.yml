@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+
+  pg_movies:
+    ports:
+      - "5432:5432"
+
+  elastic_api:
+    ports:
+      - "9200:9200"
+
+  redis_api:
+    ports:
+      - "6379:6379"
+
+  pg_auth:
+    ports:
+      - "5490:5432"
+
+  redis_auth:
+    ports:
+      - "6390:6379"
+
+  mongo_ugc:
+    ports:
+      - "27017:27017"

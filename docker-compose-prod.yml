@@ -1,0 +1,87 @@
+version: '3.9'
+
+services:
+
+  etl:
+    build:
+      context: etl
+    env_file:
+      - .env
+    depends_on:
+      - pg_movies
+      - elastic_api
+    volumes:
+      - etl_state:/opt/app/state
+
+  django_admin_panel:
+    image: cmrd/yp_django_admin_panel
+    volumes:
+      - static:/app/static
+    env_file:
+      - .env
+    depends_on:
+      - pg_movies
+
+  fastapi_app:
+    build:
+      context: fastapi_app
+    env_file:
+      - .env
+    depends_on:
+      - elastic_api
+      - redis_api
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:5047
+        tag: auth
+
+  ugc:
+    build:
+      context: ugc
+    env_file:
+      - .env
+    depends_on:
+      - mongo_ugc
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+
+  auth:
+    build:
+      context: auth
+    env_file:
+      - auth.env
+    depends_on:
+      - pg_auth
+      - redis_auth
+      - jaeger
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:5046
+        tag: auth
+
+  nginx:
+    image: nginx:1.22
+    ports:
+      - "80:80"
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/configs:/etc/nginx/conf.d:ro
+      - static:/app/static
+      - ./nginx/data:/data/:ro
+      - /tmp/logs/nginx/:/var/log/nginx/
+    depends_on:
+      - django_admin_panel
+      - fastapi_app
+      - auth
+      - ugc
+
+
+volumes:
+  etl_state:
+  static:

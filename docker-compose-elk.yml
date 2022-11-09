@@ -1,0 +1,64 @@
+services:
+  elasticlogs:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    volumes:
+      - es_logs_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    depends_on:
+      - elasticlogs
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
+    depends_on:
+      - elasticlogs
+    environment:
+      XPACK_MONITORING_ENABLED: "false"
+      ES_HOST: "elasticlogs:9200"
+    ports:
+      - "5044:5044/udp"
+      - "5046:5046/udp"
+      - "5047:5047/udp"
+    volumes:
+      - ./deploy/logstash.conf:/config/logstash.conf:ro
+      - /tmp/logs/nginx/:/var/log/nginx/:ro
+    command: logstash -f /config/logstash.conf
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    volumes:
+      - /tmp/logs/nginx:/var/log/nginx:ro
+      - ./deploy/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    depends_on:
+      - auth
+      - nginx
+      - logstash
+      - elasticlogs
+      - kibana
+    links:
+      - logstash
+
+volumes:
+  es_logs_data:
+    driver: local

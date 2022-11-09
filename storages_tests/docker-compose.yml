@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  mongodb:
+    container_name: mongo-db-test
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo:/mongo
+
+  elasticsearch:
+    container_name: elasticsearch-storage-test
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - http.compression=true
+      - http.max_content_length=500mb
+      - xpack.security.enabled=false
