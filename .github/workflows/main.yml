@@ -61,6 +61,8 @@ jobs:
 
     - name: Telegram notification
       uses: appleboy/telegram-action@master
+      env:
+        GITHUB_CONTEXT: ${{ toJSON(github) }}
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
