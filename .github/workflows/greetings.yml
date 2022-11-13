@@ -1,0 +1,18 @@
+name: Greetings
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Telegram Notify
+        uses: appleboy/telegram-action@0.0.3
+
