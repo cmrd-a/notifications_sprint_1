@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Path
 from messages.error_messages import FILM_NOT_FOUND, FILMS_NOT_FOUND, FILM_NOT_AVIABLE_TO_USER
 from models.api_models import FilmFull, FilmsRated
 from models.common import PaginatedParams
-from services.films import FilmService, get_film_service, ApiSortOptions
+from services.services import FilmService, get_film_service, ApiSortOptions
 from utils import get_permissions
 
 router = APIRouter()
