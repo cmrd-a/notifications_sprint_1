@@ -1,0 +1,5 @@
+fastapi[all]==0.85.0
+uvicorn[standard]==0.19.0
+orjson==3.8.1
+psycopg2==2.9.5
+pytz==2022.6

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi import Response, status
 
 from models.analytics import FilmProgressView
-from services.analytics import KafkaService, get_kafka_service
+from services.services import KafkaService, get_kafka_service
 
 router = APIRouter()
 
