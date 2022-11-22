@@ -17,10 +17,10 @@ def send_email(ch, method, properties, body: bytes):
 
 
 def main():
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
 
-    result = channel.queue_declare(queue='user-reporting.v1.registered', durable=True)
+    result = channel.queue_declare(queue="user-reporting.v1.registered", durable=True)
     # result = channel.queue_declare(queue='', exclusive=True)
     channel.basic_qos(prefetch_count=1)
 
@@ -28,12 +28,12 @@ def main():
     channel.start_consuming()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     email_service = EmailService()
     try:
         main()
     except KeyboardInterrupt:
-        print('Interrupted')
+        print("Interrupted")
         del email_service
         try:
             sys.exit(0)
