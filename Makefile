@@ -27,3 +27,7 @@ analytics_down:
 
 auth_debug:
 	flask --app auth/src/Auth.app --debug run
+
+
+noti_dev_up:
+	docker compose -f docker-compose-prod.yml -f docker-compose-databases.yml -f docker-compose-dev.yml up pg_notifications notifications_rabbitmq pg_auth -d

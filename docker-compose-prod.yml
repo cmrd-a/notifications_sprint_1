@@ -65,6 +65,9 @@ services:
         gelf-address: udp://127.0.0.1:5046
         tag: auth
 
+  notifications_rabbitmq:
+    image: rabbitmq:3.10-management
+
   nginx:
     image: nginx:1.22
     ports:
