@@ -7,8 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 CREATE TABLE IF NOT EXISTS public.notifications (
     task_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     users_ids INTEGER[]  NOT NULL,
-    message TEXT NOT NULL,
-    template_name text,
+    template_name VARCHAR,
     variables json,
     status status NOT NULL,
     channel notification_channel NOT NULL,

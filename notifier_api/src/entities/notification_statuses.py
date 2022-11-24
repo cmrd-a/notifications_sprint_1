@@ -1,7 +1,7 @@
-from enum import StrEnum, auto
+from enum import Enum, auto
 
 
-class NotificationStatusesV1(StrEnum):
+class NotificationStatusesV1(Enum):
     created = auto()
     processed = auto()
     error = auto()

@@ -10,6 +10,8 @@ class Settings(BaseSettings):
 
     polling_frequency: float = Field(env="POLLING_FREQUENCY", default=2.0)
 
+    rabbit_host: str = Field(env="RABBIT_HOST", default="localhost")
+
     @property
     def pg_connection_params(self):
         return {

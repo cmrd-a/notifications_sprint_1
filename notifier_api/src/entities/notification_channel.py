@@ -1,7 +1,7 @@
-from enum import StrEnum, auto
+from enum import Enum, auto
 
 
-class NotificationChannelV1(StrEnum):
+class NotificationChannelV1(Enum):
     email = auto()
     push = auto()
     sms = auto()

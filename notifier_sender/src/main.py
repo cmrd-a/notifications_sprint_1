@@ -5,6 +5,7 @@ import sys
 import pika
 
 from email_service import EmailService, EmailMessageParams
+from config import settings
 
 email_service = None
 
@@ -17,10 +18,10 @@ def send_email(ch, method, properties, body: bytes):
 
 
 def main():
-    connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(settings.rabbit_host))
     channel = connection.channel()
 
-    result = channel.queue_declare(queue="user-reporting.v1.registered", durable=True)
+    result = channel.queue_declare(queue="email-channel.v1", durable=True)
     # result = channel.queue_declare(queue='', exclusive=True)
     channel.basic_qos(prefetch_count=1)
 
