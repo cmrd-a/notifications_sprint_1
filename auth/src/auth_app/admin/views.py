@@ -145,3 +145,24 @@ def set_user_role(body):
         return abort(HTTPStatus.INTERNAL_SERVER_ERROR, f"Ошибка при назначении роли {new_user_role}.")
 
     return Response(status=HTTPStatus.OK)
+
+
+@blueprint.get("/v1/get-user-info/<int:user_id>")
+@trace
+@loging
+def get_user_info(user_id):
+    user = db.session().query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return abort(HTTPStatus.BAD_REQUEST, f"Пользователь с id {user_id} не найден.")
+
+    return jsonify(
+        {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "is_active": user.is_active,
+            "role": user.role.name,
+            "enabled_notifications": user.enabled_notifications,
+        }
+    )
