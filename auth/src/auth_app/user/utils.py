@@ -6,7 +6,9 @@ from http import HTTPStatus
 from apiflask import abort
 from auth_app.db.models import User, Role
 from auth_app.extensions import db, redis_client, jwt
+from flask import current_app
 from flask_jwt_extended import create_access_token, create_refresh_token, verify_jwt_in_request, get_jwt
+from itsdangerous import URLSafeTimedSerializer
 
 
 @jwt.token_in_blocklist_loader
@@ -56,3 +58,17 @@ def create_tokens(user: User) -> dict:
     )
     refresh_token = create_refresh_token(identity=user.email)
     return {"access_token": access_token, "refresh_token": refresh_token}
+
+
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    return serializer.dumps(email, salt=current_app.config["JWT_SECRET_KEY"])
+
+
+def confirm_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    try:
+        email = serializer.loads(token, salt=current_app.config["JWT_SECRET_KEY"], max_age=expiration)
+    except:
+        return False
+    return email

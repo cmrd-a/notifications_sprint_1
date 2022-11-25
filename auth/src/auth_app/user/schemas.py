@@ -10,6 +10,14 @@ class EmailPasswordIn(Schema):
     password = String(required=True, validate=password_validator)
 
 
+class EmailPasswordOut(Schema):
+    confirmation_token = String(required=True)
+
+
+class EmailConfirmIn(Schema):
+    confirmation_token = String(required=True)
+
+
 class LoginRefreshOut(Schema):
     access_token = String()
     refresh_token = String()

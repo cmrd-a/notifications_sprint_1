@@ -53,6 +53,8 @@ class User(CreatedUpdatedModel):
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
     social_id = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(64))
+    confirmed = db.Column(db.Boolean, default=False, nullable=False)
+    confirmed_on = db.Column(db.DateTime, default=None)
 
     role = db.relationship("Role")
 
