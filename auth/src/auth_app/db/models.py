@@ -48,11 +48,13 @@ class User(CreatedUpdatedModel):
     __tablename__ = "users"
 
     email = db.Column(db.String(80), unique=True, index=True, nullable=False)
+    email_confirmed = db.Column(db.Boolean, default=False, nullable=False)
     password = db.Column(PasswordType(schemes=["pbkdf2_sha512"]), nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
     social_id = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(64))
+    enabled_notifications = db.Column(db.ARRAY(db.String(64)))
 
     role = db.relationship("Role")
 

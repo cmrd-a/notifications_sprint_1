@@ -1,8 +1,11 @@
-http://localhost:15672/ - rabbit manage
+http://localhost:15672/ - rabbit manage guest:guest
+
+
+alembic -c src/alembic.ini revision --autogenerate -m "upgrade users table"
+alembic -c src/alembic.ini upgrade head
 
 
 
- - 
  - Спроектируйте сервис email-рассылок с учётом потенциального расширения количества способов связи.
  - Настройте отправку одинаковых писем всем пользователям.
  - Настройте отправку персонифицированных писем.

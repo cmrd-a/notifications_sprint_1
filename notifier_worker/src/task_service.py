@@ -1,19 +1,21 @@
 import json
-
+import logging
 import os
 import uuid
+from collections import namedtuple
 from dataclasses import dataclass, asdict
+from datetime import datetime, timedelta
 from enum import Enum, auto
 
 import backoff
+import httpx
 import pika
 import psycopg2
 from jinja2 import Environment, FileSystemLoader
 from psycopg2.extensions import connection as pg_connection
 from psycopg2.extras import NamedTupleCursor
-import logging
+
 from config import settings
-from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -77,30 +79,27 @@ class TaskService:
 
     @backoff.on_exception(backoff.expo, (psycopg2.InterfaceError, psycopg2.OperationalError))
     def restore_pg_connection(self):
-        print("Выполняется соединение с БД.")
         if isinstance(self, dict):
             _self: TaskService = self["args"][0]
             _self.pg_conn = get_conn()
         else:
             self.pg_conn = get_conn()
 
-    # @backoff.on_exception(
-    #     backoff.expo,
-    #     (psycopg2.InterfaceError, psycopg2.OperationalError),
-    #     on_backoff=restore_pg_connection,
-    #     logger=logger,
-    # )
+    @backoff.on_exception(
+        backoff.expo,
+        (psycopg2.InterfaceError, psycopg2.OperationalError),
+        on_backoff=restore_pg_connection,
+        logger=logger,
+    )
     def check_tasks(self):
-        print("check tasks")
         with self.pg_conn.cursor() as cur:
-            # TODO: check send time
             start_dt = datetime.now()
             end_dt = start_dt + timedelta(hours=1)
             cur.execute(
                 f"SELECT * FROM notifications WHERE status ='{NotificationStatusesV1.created.name}'"
                 f" AND send_time BETWEEN '{start_dt}' AND '{end_dt}' ORDER BY send_time"
             )
-            tasks = cur.fetchall()
+            tasks: list[namedtuple] = cur.fetchall()
         for task in tasks:
             match task.channel:
                 case NotificationChannelV1.email.name:
@@ -112,11 +111,13 @@ class TaskService:
         self, task_id: uuid, users_ids: list[int], template_name: str, variables: dict, category: str
     ):
         for user_id in users_ids:
-            # TODO: check user category setting
+            user_info = httpx.get(f"{settings.auth_url}/auth/admin/v1/get-user-info/{user_id}").json()
+            if category not in user_info["enabled_notifications"]:
+                continue
 
-            variables["user_name"] = user_id
+            variables = variables | user_info
             body = make_email_message(
-                ["sensei-92@yandex.ru"],
+                [user_info["email"]],
                 template_name,
                 variables,
             )

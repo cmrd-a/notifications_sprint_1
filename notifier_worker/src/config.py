@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     polling_frequency: float = Field(env="POLLING_FREQUENCY", default=2.0)
 
     rabbit_host: str = Field(env="RABBIT_HOST", default="localhost")
+    auth_host: str = Field(env="AUTH_HOST", default="http://localhost")
+    auth_port: int = Field(env="AUTH_PORT", default=9000)
+
+    @property
+    def auth_url(self):
+        return f"{self.auth_host}:{self.auth_port}"
 
     @property
     def pg_connection_params(self):
