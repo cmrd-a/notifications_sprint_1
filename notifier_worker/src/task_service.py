@@ -4,7 +4,7 @@ import os
 import uuid
 from collections import namedtuple
 from dataclasses import dataclass, asdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 
 import backoff
@@ -93,11 +93,9 @@ class TaskService:
     )
     def check_tasks(self):
         with self.pg_conn.cursor() as cur:
-            start_dt = datetime.now()
-            end_dt = start_dt + timedelta(hours=1)
             cur.execute(
                 f"SELECT * FROM notifications WHERE status ='{NotificationStatusesV1.created.name}'"
-                f" AND send_time BETWEEN '{start_dt}' AND '{end_dt}' ORDER BY send_time"
+                f" AND send_time <= '{datetime.now()}' ORDER BY send_time"
             )
             tasks: list[namedtuple] = cur.fetchall()
         for task in tasks:
