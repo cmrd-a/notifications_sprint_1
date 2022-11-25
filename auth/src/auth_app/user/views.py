@@ -50,16 +50,17 @@ def register(body):
     db.session.add(new_user)
     db.session.commit()
     httpx.post(
-        url=NOTIFICATOR_URL,
+        url=current_app.config["NOTIFICATOR_URL"],
         data={
             "users_ids": [new_user.id],
             "template_name": "email_verified.html",
-            "message": "Добрый день, для подтверждения электронной почты, перейдите по ссылке: {}",
             "status": "created",
             "channel": "email",
             "category": "service",
             "variables": {
-                "email_verify_url": f"{CONFIRM_HOST}/v1/confirm/{generate_confirmation_token(new_user.email)}"
+                "email_verify_url": f"{current_app.config['CONFIRM_HOST']}/v1/confirm"
+                                    f"/{generate_confirmation_token(new_user.email)}",
+                "text": "Добрый день, для подтверждения электронной почты, перейдите по ссылке",
             },
             "send_time": datetime.datetime.now(),
         },
@@ -67,10 +68,8 @@ def register(body):
 
 
 @blueprint.post("/v1/confirm/<token>")
-@jwt_required(fresh=True)
 @blueprint.input(EmailConfirmIn)
 @blueprint.output({})
-@blueprint.doc(security="BearerAuth")
 @trace
 @loging
 def confirm_email(token):

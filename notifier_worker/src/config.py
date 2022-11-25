@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     rabbit_host: str = Field(env="RABBIT_HOST", default="localhost")
     auth_host: str = Field(env="AUTH_HOST", default="http://localhost")
-    auth_port: int = Field(env="AUTH_PORT", default=9000)
+    auth_port: int = Field(default=9000)
 
     @property
     def auth_url(self):
