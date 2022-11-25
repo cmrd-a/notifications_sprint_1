@@ -1,8 +1,24 @@
+import datetime
 import logging
 from http import HTTPStatus
 
+import httpx
 from apiflask import APIBlueprint, abort
-from flask import jsonify, request, current_app
+from auth_app.db.models import Role, User, LoginHistory
+from auth_app.extensions import db, redis_client
+from auth_app.tracing import trace, loging
+from auth_app.user.schemas import (
+    LoginRefreshOut,
+    EmailPasswordIn,
+    EmailPasswordOut,
+    ChangePasswordIn,
+    LoginHistoryOut,
+    LoginHistoryIn,
+    GetPermissionsOut,
+    EmailConfirmIn,
+)
+from auth_app.user.utils import generate_confirmation_token, confirm_token
+from flask import jsonify, request, current_app, Response
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -13,26 +29,17 @@ from flask_jwt_extended import (
 )
 from user_agents import parse
 
-from auth_app.db.models import Role, User, LoginHistory
-from auth_app.extensions import db, redis_client
-from auth_app.tracing import trace, loging
-from auth_app.user.schemas import (
-    LoginRefreshOut,
-    EmailPasswordIn,
-    ChangePasswordIn,
-    LoginHistoryOut,
-    LoginHistoryIn,
-    GetPermissionsOut,
-)
-
 logger = logging.getLogger(__name__)
 blueprint = APIBlueprint("user", __name__, url_prefix="/auth/users")
 
 
 @blueprint.post("/v1/register")
 @blueprint.input(EmailPasswordIn)
-@blueprint.output({})
+@blueprint.output(EmailPasswordOut)
+@jwt_required()
+@blueprint.doc(security="BearerAuth")
 @trace
+@loging
 def register(body):
     email = body["email"]
     password = body["password"]
@@ -42,6 +49,43 @@ def register(body):
     new_user = User(email=email, password=password, role=role)
     db.session.add(new_user)
     db.session.commit()
+    httpx.post(
+        url=current_app.config["NOTIFICATOR_URL"],
+        data={
+            "users_ids": [new_user.id],
+            "template_name": "email_verified.html",
+            "status": "created",
+            "channel": "email",
+            "category": "service",
+            "variables": {
+                "email_verify_url": f"{current_app.config['CONFIRM_HOST']}/v1/confirm"
+                                    f"/{generate_confirmation_token(new_user.email)}",
+                "text": "Добрый день, для подтверждения электронной почты, перейдите по ссылке",
+            },
+            "send_time": datetime.datetime.now(),
+        },
+    )
+
+
+@blueprint.post("/v1/confirm/<token>")
+@blueprint.input(EmailConfirmIn)
+@blueprint.output({})
+@trace
+@loging
+def confirm_email(token):
+    try:
+        email = confirm_token(token)
+    except:
+        return abort(HTTPStatus.BAD_REQUEST, message="The confirmation link is invalid or has expired.")
+    user = User.query.filter_by(email=email).first_or_404()
+    if user.confirmed:
+        return Response(status=HTTPStatus.OK)
+    else:
+        user.confirmed = True
+        user.confirmed_on = datetime.datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        return Response(status=HTTPStatus.OK)
 
 
 @blueprint.post("/v1/login")

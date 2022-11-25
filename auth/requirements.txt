@@ -23,3 +23,4 @@ pyOpenSSL==22.0.0
 user-agents==2.2.0
 sentry-sdk[flask]==1.9.10
 httpx==0.23.1
+itsdangerous==2.1.2

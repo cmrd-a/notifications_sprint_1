@@ -55,6 +55,8 @@ class User(CreatedUpdatedModel):
     social_id = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(64))
     enabled_notifications = db.Column(db.ARRAY(db.String(64)))
+    confirmed = db.Column(db.Boolean, default=False, nullable=False)
+    confirmed_on = db.Column(db.DateTime, default=None)
 
     role = db.relationship("Role")
 

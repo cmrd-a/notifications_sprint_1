@@ -30,6 +30,6 @@ def create_superuser(email, password):
     user = User.query.filter_by(email=email).first()
     if not user:
         super_role = Role.query.filter_by(name="superuser").first()
-        user = User(email=email, password=password, role=super_role)
+        user = User(email=email, password=password, role=super_role, enabled_notifications=["service"])
         db.session.add(user)
         db.session.commit()

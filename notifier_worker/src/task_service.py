@@ -109,7 +109,8 @@ class TaskService:
         self, task_id: uuid, users_ids: list[int], template_name: str, variables: dict, category: str
     ):
         for user_id in users_ids:
-            user_info = httpx.get(f"{settings.auth_url}/auth/admin/v1/get-user-info/{user_id}").json()
+            url = f"http://auth:9000/auth/admin/v1/get-user-info/{user_id}"
+            user_info = httpx.get(url).json()
             if category not in user_info["enabled_notifications"]:
                 continue
 
