@@ -1,7 +1,7 @@
-from enum import Enum, auto
+from enum import Enum
 
 
 class NotificationCategoryV1(Enum):
-    service = auto()
-    content_updates = auto()
-    recommendations = auto()
+    service = "service"
+    content_updates = "content_updates"
+    recommendations = "recommendations"

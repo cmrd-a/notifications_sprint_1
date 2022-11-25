@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel
 
-from notifier_api.src.models.notification import NotificationTaskV1
+from models.notification import NotificationTaskV1
 from services.services import PGService, get_postgres_service
 
 router = APIRouter()

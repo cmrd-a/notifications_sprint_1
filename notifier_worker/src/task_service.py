@@ -5,7 +5,7 @@ import uuid
 from collections import namedtuple
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
-from enum import Enum, auto
+from enum import Enum
 
 import backoff
 import httpx
@@ -31,21 +31,21 @@ class EmailMessageParams:
 
 
 class NotificationCategoryV1(Enum):
-    service = auto()
-    content_updates = auto()
-    recommendations = auto()
+    service = "service"
+    content_updates = "content_updates"
+    recommendations = "recommendations"
 
 
 class NotificationChannelV1(Enum):
-    email = auto()
-    push = auto()
-    sms = auto()
+    email = "email"
+    push = "push"
+    sms = "sms"
 
 
 class NotificationStatusesV1(Enum):
-    created = auto()
-    processed = auto()
-    error = auto()
+    created = "created"
+    processed = "processed"
+    error = "error"
 
 
 CHANNEL_QUEUE_MAP = {NotificationChannelV1.email: "email-channel.v1"}

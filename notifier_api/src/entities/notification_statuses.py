@@ -1,7 +1,7 @@
-from enum import Enum, auto
+from enum import Enum
 
 
 class NotificationStatusesV1(Enum):
-    created = auto()
-    processed = auto()
-    error = auto()
+    created = "created"
+    processed = "processed"
+    error = "error"

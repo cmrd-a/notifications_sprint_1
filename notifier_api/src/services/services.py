@@ -1,3 +1,4 @@
+import json
 from functools import lru_cache
 
 import pytz
@@ -15,17 +16,18 @@ class PGService:
     def save_notification(self, notification: NotificationTaskV1) -> None:
         with self.conn.cursor() as cur:
             sql = """
-                INSERT INTO notifications (task_id, users_ids, message, status, channel, category, send_time) 
+                INSERT INTO notifications 
+                (users_ids, template_name, variables, status, channel, category, send_time) 
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
 
             args = (
-                notification.task_id,
                 notification.users_ids,
-                notification.message,
-                notification.status.value,
-                notification.notification_channel.value,
-                notification.notification_category.value,
+                notification.template_name,
+                json.dumps(notification.variables),
+                notification.status.name,
+                notification.channel.name,
+                notification.category.name,
                 notification.send_time.replace(tzinfo=pytz.utc).isoformat(),
             )
             cur.execute(sql, args)

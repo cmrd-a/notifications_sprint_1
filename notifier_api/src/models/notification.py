@@ -7,13 +7,10 @@ from models.common import Base
 
 
 class NotificationTaskV1(Base):
-    task_id: str
-    content_id: str
     users_ids: list[int]
-    message: str
-    notification_subject: str
     template_name: str
+    variables: dict
     status: NotificationStatusesV1
-    notification_channel: NotificationChannelV1
-    notification_category: NotificationCategoryV1
+    channel: NotificationChannelV1
+    category: NotificationCategoryV1
     send_time: datetime
