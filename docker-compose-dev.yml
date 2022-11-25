@@ -4,7 +4,7 @@ services:
 
   pg_movies:
     ports:
-      - "5432:5432"
+      - "5490:5432"
 
   elastic_api:
     ports:
@@ -16,7 +16,7 @@ services:
 
   pg_auth:
     ports:
-      - "5490:5432"
+      - "5491:5432"
 
   redis_auth:
     ports:
@@ -25,3 +25,12 @@ services:
   mongo_ugc:
     ports:
       - "27017:27017"
+
+  pg_notifications:
+    ports:
+      - "5492:5432"
+
+  notifications_rabbitmq:
+    ports:
+      - "5672:5672"
+      - "15672:15672"

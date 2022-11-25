@@ -6,7 +6,6 @@ services:
     env_file:
       - .env
     depends_on:
-      - control-center
       - clickhouse-node1
 
   zookeeper:

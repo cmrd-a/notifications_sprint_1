@@ -1,21 +1,22 @@
-import os
-from logging import config as logging_config
-
 from pydantic import BaseSettings, Field
-
-from core.logger import LOGGING
-
-logging_config.dictConfig(LOGGING)
 
 
 class Settings(BaseSettings):
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    project_name: str = Field(env="PROJECT_NAME", default="notifier")
     pg_db_name: str = Field(env="NOTI_POSTGRES_DB")
     pg_db_user: str = Field(env="NOTI_POSTGRES_USER")
     pg_db_password: str = Field(env="NOTI_POSTGRES_PASSWORD")
     pg_db_host: str = Field(env="NOTI_POSTGRES_HOST")
     pg_db_port: str = Field(env="NOTI_POSTGRES_PORT")
+
+    polling_frequency: float = Field(env="POLLING_FREQUENCY", default=2.0)
+
+    rabbit_host: str = Field(env="RABBIT_HOST", default="localhost")
+    auth_host: str = Field(env="AUTH_HOST", default="http://localhost")
+    auth_port: int = Field(env="AUTH_PORT", default=9000)
+
+    @property
+    def auth_url(self):
+        return f"{self.auth_host}:{self.auth_port}"
 
     @property
     def pg_connection_params(self):
@@ -28,4 +29,4 @@ class Settings(BaseSettings):
         }
 
 
-config = Settings()
+settings = Settings()

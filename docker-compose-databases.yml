@@ -1,0 +1,57 @@
+services:
+
+  pg_movies:
+    image: postgres:14.3
+    env_file:
+      - .env
+    volumes:
+      - pg_movies:/var/lib/postgresql/data
+      - ./deploy/postgres/movies:/docker-entrypoint-initdb.d
+
+  elastic_api:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  redis_api:
+    image: redis:7.0.4
+
+  pg_auth:
+    image: postgres:14.3
+    env_file:
+      - auth.env
+    volumes:
+      - pg_auth:/var/lib/postgresql/data
+
+  redis_auth:
+    image: redis:7.0.4
+
+  mongo_ugc:
+    image: mongo:6.0.2
+    volumes:
+      - mongo_ugc:/mongo
+    env_file:
+      - .env
+
+  pg_notifications:
+    image: postgres:14.3
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${NOTI_POSTGRES_DB}
+      - POSTGRES_USER=${NOTI_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${NOTI_POSTGRES_PASSWORD}
+    volumes:
+      - pg_notifications:/var/lib/postgresql/data
+      - ./deploy/postgres/notifications:/docker-entrypoint-initdb.d
+
+volumes:
+  pg_movies:
+  pg_auth:
+  es_data:
+  mongo_ugc:
+  pg_notifications:

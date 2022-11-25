@@ -14,8 +14,8 @@ from db import postgres
 
 app = FastAPI(
     title=config.project_name,
-    docs_url="/api/docs",
-    openapi_url="/api/openapi.json",
+    docs_url="/notifier/docs",
+    openapi_url="/notifier/openapi.json",
     default_response_class=ORJSONResponse,
 )
 
@@ -25,13 +25,13 @@ async def startup():
     postgres.pg = psycopg2.connect(**config.pg_connection_params, cursor_factory=NamedTupleCursor)
 
 
-app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["notifications"])
+app.include_router(notifications.router, prefix="/notifier/v1/notifications", tags=["notifications"])
 
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8020,
         log_config=LOGGING,
         log_level=logging.INFO,
     )
