@@ -1,5 +1,5 @@
 from apiflask import Schema
-from apiflask.fields import String, List, Integer, Nested, Email
+from apiflask.fields import String, List, Integer, Nested, Email, Boolean
 
 
 class CreateRoleIn(Schema):
@@ -34,3 +34,16 @@ class GetAllRolesOut(Schema):
 class SetUserRoleIn(Schema):
     email = Email(required=True)
     role = String(required=True)
+
+
+class GetUsersInfoIn(Schema):
+    users_ids = List(Integer(required=True))
+
+
+class GetUsersInfoOut(Schema):
+    id = Integer(required=True)
+    name = String(required=True)
+    email = Email(required=True)
+    is_active = Boolean(required=True)
+    role = String(required=True)
+    enabled_notifications = List(String())

@@ -17,7 +17,7 @@ sender_user = settings.sender_email
 
 class EmailService:
     def __init__(self):
-        self.server = smtplib.SMTP_SSL("smtp.yandex.ru", 465)
+        self.server = smtplib.SMTP_SSL(settings.smtp_host, settings.smtp_port)
         self.server.login(sender_user, settings.sender_password)
 
     def __del__(self):

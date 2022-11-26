@@ -59,7 +59,7 @@ def register(body):
             "category": "service",
             "variables": {
                 "email_verify_url": f"{current_app.config['CONFIRM_HOST']}/v1/confirm"
-                                    f"/{generate_confirmation_token(new_user.email)}",
+                f"/{generate_confirmation_token(new_user.email)}",
                 "text": "Добрый день, для подтверждения электронной почты, перейдите по ссылке",
             },
             "send_time": datetime.datetime.now(),
