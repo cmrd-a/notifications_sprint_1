@@ -8,6 +8,8 @@ from auth_app.admin.schemas import (
     ChangeRoleIn,
     GetAllRolesOut,
     SetUserRoleIn,
+    GetUsersInfoIn,
+    GetUsersInfoOut,
 )
 from auth_app.db.models import Role, Permission, User
 from auth_app.extensions import db
@@ -147,16 +149,15 @@ def set_user_role(body):
     return Response(status=HTTPStatus.OK)
 
 
-@blueprint.get("/v1/get-user-info/<int:user_id>")
+@blueprint.post("/v1/get-users-info")
+@blueprint.input(GetUsersInfoIn)
+@blueprint.output(GetUsersInfoOut(many=True))
 @trace
 @loging
-def get_user_info(user_id):
-    user = db.session().query(User).filter(User.id == user_id).first()
-
-    if not user:
-        return abort(HTTPStatus.BAD_REQUEST, f"Пользователь с id {user_id} не найден.")
-
-    return jsonify(
+def get_users_info(body):
+    # noinspection PyUnresolvedReferences
+    users = db.session().query(User).filter(User.id.in_(body["users_ids"])).all()
+    result = [
         {
             "id": user.id,
             "name": user.name,
@@ -165,4 +166,7 @@ def get_user_info(user_id):
             "role": user.role.name,
             "enabled_notifications": user.enabled_notifications,
         }
-    )
+        for user in users
+    ]
+
+    return jsonify(result)

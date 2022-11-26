@@ -108,15 +108,14 @@ class TaskService:
     def process_email_task(
         self, task_id: uuid, users_ids: list[int], template_name: str, variables: dict, category: str
     ):
-        for user_id in users_ids:
-            url = f"http://auth:9000/auth/admin/v1/get-user-info/{user_id}"
-            user_info = httpx.get(url).json()
-            if category not in user_info["enabled_notifications"]:
+        users = httpx.post("http://auth:9000/auth/admin/v1/get-users-info", json={"users_ids": users_ids}).json()
+        for user in users:
+            if category not in user["enabled_notifications"]:
                 continue
 
-            variables = variables | user_info
+            variables = variables | user
             body = make_email_message(
-                [user_info["email"]],
+                [user["email"]],
                 template_name,
                 variables,
             )
