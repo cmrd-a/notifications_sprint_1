@@ -22,7 +22,7 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup():
-    postgres.pg = await psycopg.AsyncConnection.connect(**config.pg_connection_params, cursor_factory=NamedTupleCursor)
+    postgres.pg = await psycopg.AsyncConnection.connect(**config.pg_connection_params)
 
 
 @app.on_event("shutdown")

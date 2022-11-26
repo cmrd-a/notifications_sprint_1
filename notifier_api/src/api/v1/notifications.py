@@ -17,5 +17,5 @@ async def create_notification_task(
     body: NotificationTaskV1,
     pg_service: PGService = Depends(get_postgres_service),
 ):
-    pg_service.save_notification(notification=body)
+    await pg_service.save_notification(notification=body)
     return Response(status_code=status.HTTP_201_CREATED)

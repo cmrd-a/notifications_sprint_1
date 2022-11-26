@@ -13,7 +13,7 @@ class PGService:
     def __init__(self, conn: AsyncConnection):
         self.conn = conn
 
-    def save_notification(self, notification: NotificationTaskV1) -> None:
+    async def save_notification(self, notification: NotificationTaskV1) -> None:
         async with self.conn.cursor() as cur:
             sql = """
                 INSERT INTO notifications 
