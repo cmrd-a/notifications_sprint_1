@@ -1,7 +1,7 @@
-from psycopg2.extensions import connection
+from psycopg import AsyncConnection
 
-pg: connection | None = None
+pg: AsyncConnection | None = None
 
 
-async def get_postgres() -> connection | None:
+async def get_postgres() -> AsyncConnection | None:
     return pg

@@ -1,6 +1,6 @@
 import logging
 
-import psycopg2
+import psycopg
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
@@ -22,7 +22,12 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup():
-    postgres.pg = psycopg2.connect(**config.pg_connection_params, cursor_factory=NamedTupleCursor)
+    postgres.pg = await psycopg.AsyncConnection.connect(**config.pg_connection_params, cursor_factory=NamedTupleCursor)
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await postgres.pg.close()
 
 
 app.include_router(notifications.router, prefix="/notifier/v1/notifications", tags=["notifications"])
